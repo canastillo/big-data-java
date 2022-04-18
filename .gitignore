@@ -1,4 +1,4 @@
-data/*.txt
-data/*.txt.gz
+data/*.txt*
 data/prueba.*
-data/movies-large.csv
+data/alphanumeric*
+data/*python*
