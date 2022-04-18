@@ -1,0 +1,4 @@
+data/*.txt
+data/*.txt.gz
+data/prueba.*
+data/movies-large.csv
