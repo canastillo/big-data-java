@@ -3,7 +3,6 @@ package nearsoft.academy.bigdata.recommendation;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,63 +12,59 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class CSVGenerator {
-    DataAccess dataAccess;
-    BufferedReader br;
-    FileReader fr;
-    File file;
-    String st;
+    private BufferedReader inputFile;
+    private PrintWriter outputFile;
+    private IndexStorage indexStorage;
 
-    public CSVGenerator(DataAccess dataAccess) throws FileNotFoundException {
-        this.dataAccess = dataAccess;
-        this.file = new File("data/movies.txt");
-        this.br = new BufferedReader(new FileReader(file));
+    public CSVGenerator(IndexStorage indexStorage) throws IOException {
+        this.indexStorage = indexStorage;
+        this.inputFile = new BufferedReader(new FileReader(new File("data/movies.txt")));
+        this.outputFile = new PrintWriter(new BufferedWriter(new FileWriter("data/numeric.csv")));
     }
 
     public void generate() throws IOException {
-        PrintWriter csv = new PrintWriter(new BufferedWriter(new FileWriter("data/numeric.csv")));
         List<String> row = new ArrayList<String>();
-        String csvLine = "";
-
+        String currentLine;
         int userCount = 0;
         int productCount = 0;
-        boolean wasCreated = false;
+        boolean isNewRegister = false;
 
-        while ((this.st = this.br.readLine()) != null) {
+        while ( (currentLine = this.inputFile.readLine()) != null ) {
             Pattern pattern = Pattern.compile("review/userId|product/productId|review/score");    
-            Matcher matcher = pattern.matcher(st);  
+            Matcher matcher = pattern.matcher(currentLine);  
 
             if (matcher.find()) {
-                String data = st.split(": ")[1];
+                String data = currentLine.split(": ")[1];
+                String currentField = matcher.group();
 
-                if (matcher.group().equals("review/userId")) {
-                    wasCreated = this.dataAccess.addUser(data, userCount);
-                    if (wasCreated) userCount += 1;
-                    row.add(this.dataAccess.usersHash.get(data).toString());
+                if ( currentField.equals("review/userId") ) {
+                    isNewRegister = this.indexStorage.addUser(data, userCount);
+                    if (isNewRegister) userCount += 1;
+
+                    int numericId = this.indexStorage.getNumericUserId(data);
+                    row.add(Integer.toString(numericId));
                 }
 
-                if (matcher.group().equals("product/productId")) {
-                    wasCreated = this.dataAccess.addProduct(data, productCount);
-                    if (wasCreated) productCount += 1;
-                    row.add(this.dataAccess.productsHash.get(data).toString());
+                if ( currentField.equals("product/productId") ) {
+                    isNewRegister = this.indexStorage.addProduct(data, productCount);
+                    if (isNewRegister) productCount += 1;
+
+                    int numericId = this.indexStorage.getNumericProductId(data);
+                    row.add(Integer.toString(numericId));
                 }
 
-                wasCreated = false;
-
-                if ( matcher.group().equals("review/score") ) {
+                if ( currentField.equals("review/score") ) {
                     row.add(data);
-
-                    csvLine = String.join(",", row);
-                    csv.println(csvLine);
-
-                    csvLine = "";
+                    outputFile.println(String.join(",", row));
                     row.clear();
                 }
+
+                isNewRegister = false;
             }
         }
 
-        csv.close();
+        outputFile.close();
     }
 }
 

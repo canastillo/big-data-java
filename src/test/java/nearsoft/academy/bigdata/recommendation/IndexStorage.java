@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-public class DataAccess {
-    Hashtable<String,Integer> usersHash;
-    Hashtable<String,Integer> productsHash;
-    List<String> usersArray;
-    List<String> productsArray;
+public class IndexStorage {
+    private Hashtable<String,Integer> usersHash;
+    private Hashtable<String,Integer> productsHash;
+    private List<String> productsArray;
 
-    public DataAccess() {
+    public IndexStorage() {
         this.usersHash = new Hashtable<String,Integer>();
-        this.usersArray = new ArrayList<String>();
         this.productsHash = new Hashtable<String,Integer>();
         this.productsArray = new ArrayList<String>();
     }
@@ -30,7 +28,6 @@ public class DataAccess {
     public boolean addUser(String data, int userCount) {
         if (this.usersHash.get(data) == null) {
             this.usersHash.put(data,userCount);
-            this.usersArray.add(data);
             return true;
         }
 
@@ -39,6 +36,10 @@ public class DataAccess {
 
     public int getNumericUserId(String alphaId) {
         return this.usersHash.get(alphaId);
+    }
+
+    public int getNumericProductId(String alphaId) {
+        return this.productsHash.get(alphaId);
     }
 
     public String getAlphaProductId(int numericId) {
