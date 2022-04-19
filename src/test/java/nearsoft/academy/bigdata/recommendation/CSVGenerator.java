@@ -16,11 +16,13 @@ public class CSVGenerator {
     private BufferedReader inputFile;
     private PrintWriter outputFile;
     private IndexStorage indexStorage;
+    private int totalLines;
 
     public CSVGenerator(IndexStorage indexStorage) throws IOException {
         this.indexStorage = indexStorage;
         this.inputFile = new BufferedReader(new FileReader(new File("data/movies.txt")));
         this.outputFile = new PrintWriter(new BufferedWriter(new FileWriter("data/numeric.csv")));
+        this.totalLines = 0;
     }
 
     public void generate() throws IOException {
@@ -57,6 +59,7 @@ public class CSVGenerator {
                 if ( currentField.equals("review/score") ) {
                     row.add(data);
                     outputFile.println(String.join(",", row));
+                    totalLines = totalLines + 1;
                     row.clear();
                 }
 
@@ -65,6 +68,10 @@ public class CSVGenerator {
         }
 
         outputFile.close();
+    }
+
+    public int getTotalLines() {
+        return this.totalLines;
     }
 }
 

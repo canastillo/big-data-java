@@ -35,9 +35,7 @@ public class MovieRecommender {
     }
 
     public int getTotalReviews() throws TasteException, IOException {
-
-        //System.out.println(this.file.length());
-        return 7911684;
+        return csvGenerator.getTotalLines();
     }
     
     public int getTotalProducts() throws TasteException {
